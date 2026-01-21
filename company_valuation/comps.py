@@ -8,9 +8,10 @@ This module implements:
 - Peer group statistics
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
-import numpy as np
+
+from company_valuation.utils import filter_valid_values, calculate_statistics
 
 
 @dataclass
@@ -194,31 +195,11 @@ class ComparableAnalysis:
     """
     peers: list[PeerCompany]
 
-    def _filter_valid(self, values: list[Optional[float]]) -> list[float]:
-        """Filter out None values and return valid floats."""
-        return [v for v in values if v is not None]
-
-    def _statistics(self, values: list[float]) -> dict:
-        """Calculate statistics for a list of values."""
-        if not values:
-            return {
-                "mean": None,
-                "median": None,
-                "min": None,
-                "max": None,
-                "p25": None,
-                "p75": None
-            }
-
-        arr = np.array(values)
-        return {
-            "mean": float(np.mean(arr)),
-            "median": float(np.median(arr)),
-            "min": float(np.min(arr)),
-            "max": float(np.max(arr)),
-            "p25": float(np.percentile(arr, 25)),
-            "p75": float(np.percentile(arr, 75))
-        }
+    def _get_statistics(self, values: list[float]) -> dict:
+        """Calculate statistics for a list of values, excluding count."""
+        stats = calculate_statistics(values)
+        stats.pop("count", None)
+        return stats
 
     def ev_ebitda_multiples(self, use_ntm: bool = False) -> dict:
         """
@@ -231,37 +212,32 @@ class ComparableAnalysis:
             Dictionary with peer multiples and statistics
         """
         multiples = {p.ticker: p.ev_ebitda(use_ntm) for p in self.peers}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": self._get_statistics(valid)}
 
     def ev_ebit_multiples(self) -> dict:
         """Get EV/EBIT multiples for all peers with statistics."""
         multiples = {p.ticker: p.ev_ebit() for p in self.peers}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": self._get_statistics(valid)}
 
     def ev_revenue_multiples(self, use_ntm: bool = False) -> dict:
         """Get EV/Revenue multiples for all peers with statistics."""
         multiples = {p.ticker: p.ev_revenue(use_ntm) for p in self.peers}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": self._get_statistics(valid)}
 
     def pe_ratios(self, use_ntm: bool = False) -> dict:
         """Get P/E ratios for all peers with statistics."""
         multiples = {p.ticker: p.pe_ratio(use_ntm) for p in self.peers}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": self._get_statistics(valid)}
 
     def price_to_book_ratios(self) -> dict:
         """Get P/BV ratios for all peers with statistics."""
         multiples = {p.ticker: p.price_to_book() for p in self.peers}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": self._get_statistics(valid)}
 
     def implied_value(self, target_metric: float, multiple_type: str = "ev_ebitda",
                       use_median: bool = True, use_ntm: bool = False) -> dict:

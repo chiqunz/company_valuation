@@ -8,9 +8,10 @@ This module implements:
 """
 
 from dataclasses import dataclass
-from datetime import date, datetime
+from datetime import date
 from typing import Optional
-import numpy as np
+
+from company_valuation.utils import filter_valid_values, calculate_statistics
 
 
 @dataclass
@@ -176,34 +177,6 @@ class PrecedentAnalysis:
             filtered.append(t)
         return PrecedentAnalysis(filtered)
 
-    def _filter_valid(self, values: list[Optional[float]]) -> list[float]:
-        """Filter out None values."""
-        return [v for v in values if v is not None]
-
-    def _statistics(self, values: list[float]) -> dict:
-        """Calculate statistics for a list of values."""
-        if not values:
-            return {
-                "mean": None,
-                "median": None,
-                "min": None,
-                "max": None,
-                "p25": None,
-                "p75": None,
-                "count": 0
-            }
-
-        arr = np.array(values)
-        return {
-            "mean": float(np.mean(arr)),
-            "median": float(np.median(arr)),
-            "min": float(np.min(arr)),
-            "max": float(np.max(arr)),
-            "p25": float(np.percentile(arr, 25)),
-            "p75": float(np.percentile(arr, 75)),
-            "count": len(values)
-        }
-
     def control_premium_statistics(self) -> dict:
         """
         Calculate control premium statistics.
@@ -211,29 +184,26 @@ class PrecedentAnalysis:
         Returns:
             Statistics on control premiums paid
         """
-        premiums = self._filter_valid([t.control_premium for t in self.transactions])
-        return self._statistics(premiums)
+        premiums = filter_valid_values([t.control_premium for t in self.transactions])
+        return calculate_statistics(premiums)
 
     def ev_ebitda_multiples(self) -> dict:
         """Get EV/EBITDA transaction multiples with statistics."""
         multiples = {t.target_name: t.ev_ebitda for t in self.transactions}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": calculate_statistics(valid)}
 
     def ev_ebit_multiples(self) -> dict:
         """Get EV/EBIT transaction multiples with statistics."""
         multiples = {t.target_name: t.ev_ebit for t in self.transactions}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": calculate_statistics(valid)}
 
     def ev_revenue_multiples(self) -> dict:
         """Get EV/Revenue transaction multiples with statistics."""
         multiples = {t.target_name: t.ev_revenue for t in self.transactions}
-        valid = self._filter_valid(list(multiples.values()))
-        stats = self._statistics(valid)
-        return {"multiples": multiples, "statistics": stats}
+        valid = filter_valid_values(list(multiples.values()))
+        return {"multiples": multiples, "statistics": calculate_statistics(valid)}
 
     def implied_value(self, target_metric: float, multiple_type: str = "ev_ebitda",
                       use_median: bool = True) -> dict:

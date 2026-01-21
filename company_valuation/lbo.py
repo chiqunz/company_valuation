@@ -10,9 +10,8 @@ This module implements:
 - Circularity resolution through iteration
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
-import numpy as np
 
 
 @dataclass
@@ -343,6 +342,10 @@ class LBOModel:
         Uses binary search to find the entry multiple that yields
         the target IRR.
 
+        Note: This method does not scale debt with purchase price. If you need
+        debt to scale proportionally with the entry multiple, create new model
+        instances for each test case.
+
         Args:
             target_irr: Target IRR (e.g., 0.20 for 20%)
             min_multiple: Minimum multiple to consider
@@ -353,32 +356,26 @@ class LBOModel:
             Entry multiple that achieves target IRR, or None if not achievable
         """
         original_multiple = self.entry_multiple
-
         low, high = min_multiple, max_multiple
 
-        for _ in range(50):  # Max iterations
-            mid = (low + high) / 2
-            self.entry_multiple = mid
+        try:
+            for _ in range(50):
+                mid = (low + high) / 2
+                self.entry_multiple = mid
 
-            # Recalculate debt based on new multiple
-            # Assuming debt scales with purchase price
-            scale = mid / original_multiple
-            for t in self.debt_tranches:
-                t.amount = t.amount * scale / (self.entry_multiple / original_multiple)
+                result = self.run_model()
 
-            result = self.run_model()
+                if abs(result.irr - target_irr) < tolerance:
+                    return mid
 
-            if abs(result.irr - target_irr) < tolerance:
-                self.entry_multiple = original_multiple
-                return mid
+                if result.irr > target_irr:
+                    low = mid
+                else:
+                    high = mid
 
-            if result.irr > target_irr:
-                low = mid  # Can pay more
-            else:
-                high = mid  # Need to pay less
-
-        self.entry_multiple = original_multiple
-        return None
+            return None
+        finally:
+            self.entry_multiple = original_multiple
 
     @classmethod
     def simple_lbo(cls, entry_ebitda: float, entry_multiple: float,

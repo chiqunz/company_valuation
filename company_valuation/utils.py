@@ -4,10 +4,13 @@ Utility functions for valuation.
 This module implements:
 - Treasury Stock Method (TSM) for diluted shares
 - Common financial calculations
+- Shared statistical utilities
 """
 
 from dataclasses import dataclass
 from typing import Optional
+
+import numpy as np
 
 
 @dataclass
@@ -261,4 +264,50 @@ def ev_to_equity_bridge(
         "equity_value": equity_value,
         "diluted_shares": diluted_shares,
         "equity_value_per_share": per_share
+    }
+
+
+def filter_valid_values(values: list[Optional[float]]) -> list[float]:
+    """
+    Filter out None values and return valid floats.
+
+    Args:
+        values: List of optional float values
+
+    Returns:
+        List containing only non-None values
+    """
+    return [v for v in values if v is not None]
+
+
+def calculate_statistics(values: list[float]) -> dict:
+    """
+    Calculate descriptive statistics for a list of values.
+
+    Args:
+        values: List of numeric values
+
+    Returns:
+        Dictionary with mean, median, min, max, p25, p75, and count
+    """
+    if not values:
+        return {
+            "mean": None,
+            "median": None,
+            "min": None,
+            "max": None,
+            "p25": None,
+            "p75": None,
+            "count": 0
+        }
+
+    arr = np.array(values)
+    return {
+        "mean": float(np.mean(arr)),
+        "median": float(np.median(arr)),
+        "min": float(np.min(arr)),
+        "max": float(np.max(arr)),
+        "p25": float(np.percentile(arr, 25)),
+        "p75": float(np.percentile(arr, 75)),
+        "count": len(values)
     }

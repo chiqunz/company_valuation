@@ -7,8 +7,7 @@ This module implements:
 """
 
 from dataclasses import dataclass
-from typing import Callable, Optional, Any
-import numpy as np
+from typing import Any, Callable, Optional
 
 
 @dataclass
@@ -277,7 +276,6 @@ class SensitivityAnalysis:
         def calc_irr(entry: float, exit_mult: float) -> float:
             base_lbo.entry_multiple = entry
             base_lbo.exit_multiple = exit_mult
-            # Also need to adjust debt for entry multiple
             try:
                 result = base_lbo.run_model()
                 return result.irr

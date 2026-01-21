@@ -18,7 +18,17 @@ from company_valuation.lbo import LBOModel, DebtTranche
 from company_valuation.ddm import DDMModel
 from company_valuation.sotp import SOTPModel, Segment
 from company_valuation.sensitivity import SensitivityAnalysis
-from company_valuation.utils import treasury_stock_method, diluted_shares
+from company_valuation.utils import (
+    treasury_stock_method,
+    diluted_shares,
+    enterprise_value,
+    equity_value_from_ev,
+    net_debt,
+    ltm_calculation,
+    ev_to_equity_bridge,
+    filter_valid_values,
+    calculate_statistics,
+)
 
 __version__ = "0.1.0"
 
@@ -40,4 +50,11 @@ __all__ = [
     "SensitivityAnalysis",
     "treasury_stock_method",
     "diluted_shares",
+    "enterprise_value",
+    "equity_value_from_ev",
+    "net_debt",
+    "ltm_calculation",
+    "ev_to_equity_bridge",
+    "filter_valid_values",
+    "calculate_statistics",
 ]

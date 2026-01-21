@@ -9,9 +9,8 @@ This module implements:
 - Enterprise Value to Equity Value bridge
 """
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
-import numpy as np
 
 
 @dataclass
@@ -121,20 +120,16 @@ class DCFModel:
             List of discount periods for each projection year
         """
         periods = []
-        for i, proj in enumerate(self.projections):
+        for i in range(len(self.projections)):
             if i == 0:
-                # First period may be a stub
                 base_period = self.stub_fraction
+                mid_year_adjustment = self.stub_fraction / 2
             else:
-                # Subsequent periods are full years from start
                 base_period = self.stub_fraction + i
+                mid_year_adjustment = 0.5
 
             if self.mid_year_convention:
-                # Mid-year: assume cash arrives mid-period
-                if i == 0:
-                    period = self.stub_fraction / 2
-                else:
-                    period = base_period - 0.5
+                period = base_period - mid_year_adjustment
             else:
                 period = base_period
 
