@@ -3,7 +3,6 @@ name = "company-valuation"
 version = "0.1.0"
 description = "Institutional-grade company valuation models: DCF, Comps, LBO, DDM, SOTP"
 authors = ["Your Name <your.email@example.com>"]
-readme = "README.md"
 packages = [{include = "company_valuation"}]
 
 [tool.poetry.dependencies]

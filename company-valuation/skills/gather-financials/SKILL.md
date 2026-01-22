@@ -7,6 +7,12 @@ description: Use when gathering revenue, EBITDA, debt, and other financial metri
 
 Search the web to collect financial statement data for DCF and comparable analysis.
 
+## Before You Start
+
+**Read the plugin README first** to understand the exact parameters needed:
+- See `README.md` section: **"Required Data Parameters > Financial Data (gather-financials)"**
+- This ensures you gather all required fields with correct types and units (all monetary values in millions $)
+
 ## Required Data Points
 
 ### Income Statement (LTM - Last Twelve Months)

@@ -7,6 +7,12 @@ description: Use when gathering stock price, market cap, beta, and shares outsta
 
 Search the web to collect current market data for a company.
 
+## Before You Start
+
+**Read the plugin README first** to understand the exact parameters needed:
+- See `README.md` section: **"Required Data Parameters > Market Data (gather-market-data)"**
+- This ensures you gather all required fields with correct types and units
+
 ## Required Data Points
 
 | Data Point | Description | Example Source |

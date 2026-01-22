@@ -7,6 +7,12 @@ description: Use when searching for analyst price targets, ratings, and forward 
 
 Search the web for sell-side analyst coverage and consensus estimates.
 
+## Before You Start
+
+**Read the plugin README first** to understand the exact parameters needed:
+- See `README.md` section: **"Required Data Parameters > Analyst Estimates (gather-analyst-estimates)"**
+- This ensures you gather all required fields with correct types
+
 ## Required Data Points
 
 | Data Point | Description |

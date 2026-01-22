@@ -7,6 +7,12 @@ description: Use when gathering historical P/E ratio data for historical valuati
 
 Search the web to collect historical P/E ratio data for a company over the past 500 trading days (~2 years).
 
+## Before You Start
+
+**Read the plugin README first** to understand the exact parameters needed:
+- See `README.md` section: **"Required Data Parameters > Historical P/E Data (gather-historical-pe)"**
+- This ensures you gather all required percentiles and EPS values with correct types
+
 ## Required Data Points
 
 | Data Point | Description |

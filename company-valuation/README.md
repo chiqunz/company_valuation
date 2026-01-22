@@ -13,8 +13,7 @@ A Claude Code plugin that performs institutional-grade company valuation analysi
 
 ## Installation
 
-1. Ensure the `company_valuation` Python library is available in your project
-2. Install the plugin in Claude Code:
+Install the plugin in Claude Code:
 
 ```bash
 claude --plugin-dir ./company-valuation
@@ -28,6 +27,13 @@ Or add to your Claude Code settings:
 }
 ```
 
+### Python Library Setup
+
+```bash
+cd company-valuation/skills/run-valuation/scripts
+poetry install
+```
+
 ## Usage
 
 Run a valuation analysis:
@@ -35,15 +41,6 @@ Run a valuation analysis:
 ```
 /company-valuation:value-company AAPL
 ```
-
-This will:
-1. Search for Apple's current market data (price, shares, beta)
-2. Gather financial metrics (revenue, EBITDA, debt, etc.)
-3. Identify comparable companies and gather their data
-4. Search for analyst price targets and estimates
-5. Gather historical P/E data (500 trading days / ~2 years)
-6. Execute DCF, Comps, LBO, and Historical P/E valuation models
-7. Generate a comprehensive report at `./valuation_reports/AAPL_YYYY-MM-DD.md`
 
 ## Plugin Structure
 
@@ -60,6 +57,8 @@ company-valuation/
 │   ├── gather-analyst-estimates/  # Price targets, ratings
 │   ├── gather-historical-pe/ # Historical P/E data
 │   ├── run-valuation/        # Execute Python models
+│   │   ├── SKILL.md
+│   │   └── scripts/          # Python valuation library
 │   └── generate-report/      # Create markdown report
 └── README.md
 ```
@@ -76,84 +75,191 @@ company-valuation/
 | `run-valuation` | Execute DCF, Comps, LBO, Historical P/E models |
 | `generate-report` | Create comprehensive markdown valuation report |
 
-## Valuation Models
+---
 
-### DCF (Discounted Cash Flow)
-- 5-year explicit forecast period
-- WACC calculated via CAPM
-- Terminal value via perpetuity growth and exit multiple
-- Mid-year convention
-- Sensitivity analysis (WACC vs terminal growth)
+## Required Data Parameters
 
-### Comparable Company Analysis
-- 4-6 peer companies
-- Trading multiples: EV/EBITDA, EV/Revenue, P/E
-- Implied valuation based on peer medians
+This section documents all required parameters for the valuation models. **All gather skills should reference this section** to ensure they collect the correct data.
 
-### LBO (Leveraged Buyout)
-- Simplified single-tranche debt structure
-- Ability-to-pay analysis (max price for target IRR)
-- MOIC and IRR calculation
+### Market Data (gather-market-data)
+
+| Parameter | Type | Unit | Description | Used By |
+|-----------|------|------|-------------|---------|
+| `ticker` | string | - | Stock ticker symbol (e.g., "AAPL") | All models |
+| `company_name` | string | - | Full company name | Report |
+| `price` | float | $ | Current stock price | Comps, P/E |
+| `shares_outstanding` | float | millions | Diluted shares outstanding | DCF, Comps |
+| `market_cap` | float | millions $ | Market capitalization (price × shares) | WACC, Comps |
+| `beta` | float | - | 5-year monthly beta vs S&P 500 (typically 0.5-2.5) | WACC/CAPM |
+| `fifty_two_week_low` | float | $ | 52-week low price | Report |
+| `fifty_two_week_high` | float | $ | 52-week high price | Report |
+
+### Financial Data (gather-financials)
+
+#### Income Statement (LTM values in millions $)
+
+| Parameter | Type | Description | Used By |
+|-----------|------|-------------|---------|
+| `revenue` | float | Total revenue / sales | DCF projections, Comps |
+| `ebitda` | float | EBITDA (EBIT + D&A) | Comps, LBO |
+| `ebit` | float | Operating income | DCF (UFCF calculation) |
+| `net_income` | float | Net income | P/E calculation |
+| `depreciation_amortization` | float | D&A expense | DCF (UFCF = NOPAT + D&A - CapEx - ΔNWC) |
+
+#### Balance Sheet (in millions $)
+
+| Parameter | Type | Description | Used By |
+|-----------|------|-------------|---------|
+| `total_debt` | float | Short-term + long-term debt | WACC, EV bridge |
+| `cash` | float | Cash and cash equivalents | Net debt calculation |
+| `net_debt` | float | Total debt - cash (negative = net cash) | DCF equity bridge, Comps EV |
+
+#### Cash Flow Statement (in millions $)
+
+| Parameter | Type | Description | Used By |
+|-----------|------|-------------|---------|
+| `capex` | float | Capital expenditures (positive number) | DCF (UFCF), LBO |
+| `delta_nwc` | float | Change in net working capital (increase = positive) | DCF (UFCF) |
+
+#### Rates and Margins
+
+| Parameter | Type | Description | Used By |
+|-----------|------|-------------|---------|
+| `tax_rate` | float | Effective tax rate (e.g., 0.25 for 25%) | WACC, DCF, LBO |
+| `ebitda_margin` | float | EBITDA / Revenue | Projections validation |
+| `revenue_growth_3yr` | float | 3-year revenue CAGR | DCF projections |
+| `projected_growth_rate` | float | Forward growth rate for projections | DCF 5-year forecast |
+
+### Peer Company Data (gather-peers)
+
+For each of 4-6 comparable companies:
+
+| Parameter | Type | Unit | Description | Used By |
+|-----------|------|------|-------------|---------|
+| `ticker` | string | - | Peer stock ticker | Comps |
+| `name` | string | - | Peer company name | Comps |
+| `price` | float | $ | Current stock price | Comps (market cap) |
+| `shares_outstanding` | float | millions | Diluted shares | Comps (market cap) |
+| `net_debt` | float | millions $ | Total debt - cash | Comps (EV calculation) |
+| `ltm_revenue` | float | millions $ | Last twelve months revenue | EV/Revenue multiple |
+| `ltm_ebitda` | float | millions $ | Last twelve months EBITDA | EV/EBITDA multiple |
+| `ltm_ebit` | float | millions $ | Last twelve months EBIT (optional) | EV/EBIT multiple |
+| `ltm_net_income` | float | millions $ | Last twelve months net income (optional) | P/E ratio |
+
+### Analyst Estimates (gather-analyst-estimates)
+
+| Parameter | Type | Description | Used By |
+|-----------|------|-------------|---------|
+| `price_target_low` | float | Lowest analyst price target | Report comparison |
+| `price_target_mean` | float | Consensus price target | Report comparison |
+| `price_target_high` | float | Highest analyst price target | Report comparison |
+| `consensus_rating` | string | "Strong Buy", "Buy", "Hold", "Sell", "Strong Sell" | Report |
+| `analyst_count` | int | Number of analysts covering | Report confidence |
+| `forward_revenue` | float | NTM revenue estimate (millions $) | NTM multiples |
+| `forward_eps` | float | NTM EPS estimate | P/E valuation |
+| `revenue_growth_estimate` | float | Expected revenue growth rate | Projection validation |
+
+### Historical P/E Data (gather-historical-pe)
+
+| Parameter | Type | Description | Used By |
+|-----------|------|-------------|---------|
+| `pe_min` | float | Minimum P/E over 2-year period | P/E valuation range |
+| `pe_max` | float | Maximum P/E over 2-year period | P/E valuation range |
+| `pe_mean` | float | Average P/E over period | P/E valuation |
+| `pe_median` | float | Median P/E (50th percentile) | P/E valuation base case |
+| `pe_p10` | float | 10th percentile P/E | P/E valuation range |
+| `pe_p25` | float | 25th percentile P/E | P/E valuation conservative |
+| `pe_p75` | float | 75th percentile P/E | P/E valuation optimistic |
+| `pe_p90` | float | 90th percentile P/E | P/E valuation range |
+| `pe_current` | float | Current trailing P/E | Valuation context |
+| `pe_percentile_rank` | int | Current P/E percentile vs history (0-100) | Over/undervalued assessment |
+| `eps_ttm` | float | Trailing twelve months EPS | P/E valuation (TTM basis) |
+| `eps_forward` | float | Forward (NTM) EPS estimate | P/E valuation (forward basis) |
+
+---
+
+## Valuation Model Details
+
+### WACC Calculation
+
+**Formula**: `WACC = (E/V × Re) + (D/V × Rd × (1-T))`
+
+| Input | Source | Notes |
+|-------|--------|-------|
+| `equity_value` | gather-market-data | Market cap |
+| `debt_value` | gather-financials | Total debt (market value proxy) |
+| `risk_free_rate` | External | 10-year Treasury yield (~4.5%) |
+| `beta` | gather-market-data | 5-year monthly beta |
+| `equity_risk_premium` | External | Historical ERP (~5%) |
+| `cost_of_debt` | Estimate | Based on credit rating (~6-8%) |
+| `tax_rate` | gather-financials | Effective or marginal tax rate |
+
+### DCF Model (UFCFProjection)
+
+**UFCF Formula**: `EBIT × (1 - Tax Rate) + D&A - CapEx - ΔNWC`
+
+| Input | Source | Notes |
+|-------|--------|-------|
+| `revenue` | Projected | Base from gather-financials, grown at projected_growth_rate |
+| `ebit` | Projected | Apply historical EBIT margin to projected revenue |
+| `tax_rate` | gather-financials | Marginal tax rate |
+| `depreciation_amortization` | Projected | % of revenue based on historical |
+| `capex` | Projected | % of revenue based on historical |
+| `delta_nwc` | Projected | ~1% of revenue change |
+| `wacc` | Calculated | From WACC model |
+| `terminal_growth` | Assumption | Long-term GDP growth (~2.5%) |
+| `exit_multiple` | Comps | Sector average EV/EBITDA |
+| `net_debt` | gather-financials | For equity bridge |
+| `shares_outstanding` | gather-market-data | For per-share value |
+
+### Comparable Company Analysis (PeerCompany)
+
+| Input | Source | Notes |
+|-------|--------|-------|
+| `ticker` | gather-peers | Peer identifier |
+| `name` | gather-peers | Display name |
+| `price` | gather-peers | Current stock price |
+| `shares_outstanding` | gather-peers | Diluted shares |
+| `net_debt` | gather-peers | For EV calculation |
+| `ltm_revenue` | gather-peers | For EV/Revenue |
+| `ltm_ebitda` | gather-peers | For EV/EBITDA |
+| `ltm_ebit` | gather-peers | For EV/EBIT (optional) |
+| `ltm_net_income` | gather-peers | For P/E (optional) |
+
+### LBO Model (simple_lbo)
+
+| Input | Source | Notes |
+|-------|--------|-------|
+| `entry_ebitda` | gather-financials | Current EBITDA |
+| `entry_multiple` | Assumption | Starting EV/EBITDA (e.g., 10x) |
+| `leverage_turns` | Assumption | Debt/EBITDA (e.g., 5-6x) |
+| `interest_rate` | Market | Leveraged loan rate (~8-9%) |
+| `exit_multiple` | Assumption | Often same as entry (conservative) |
+| `hold_years` | Assumption | Typically 5 years |
+| `ebitda_growth` | gather-financials | projected_growth_rate |
+| `capex_pct` | gather-financials | capex / ebitda |
+| `tax_rate` | gather-financials | Cash tax rate |
 
 ### Historical P/E Valuation
-- Uses ~500 trading days (~2 years) of P/E history
-- Calculates P/E percentiles (10th, 25th, 50th, 75th, 90th)
-- Applies P/E percentiles to TTM EPS for valuation range
-- Applies P/E percentiles to Forward EPS for growth-adjusted range
-- Shows current P/E percentile rank vs history
 
-## Report Output
+| Input | Source | Notes |
+|-------|--------|-------|
+| `pe_p25`, `pe_median`, `pe_p75` | gather-historical-pe | P/E percentiles |
+| `eps_ttm` | gather-historical-pe | For TTM-based valuation |
+| `eps_forward` | gather-historical-pe | For forward-based valuation |
 
-Reports are saved to `./valuation_reports/` with the format:
-```
-{TICKER}_{YYYY-MM-DD}.md
-```
+**Implied Price Calculation**:
+- Conservative: `EPS × P/E_25th`
+- Base Case: `EPS × P/E_median`
+- Optimistic: `EPS × P/E_75th`
 
-Example: `AAPL_2026-01-20.md`
+---
 
-## Requirements
+## Running Tests
 
-- Claude Code with plugin support
-- Python 3.10+
-- `company_valuation` library installed
-- Web search capability for data gathering
-
-## Example Output
-
-```
-> /company-valuation:value-company MSFT
-
-Gathering market data for MSFT...
-  - Price: $378.50
-  - Market Cap: $2.81T
-  - Beta: 0.89
-
-Gathering financial data...
-  - LTM Revenue: $227.6B
-  - LTM EBITDA: $108.5B
-
-Identifying comparable companies...
-  - AAPL, GOOGL, META, AMZN
-
-Gathering historical P/E data...
-  - 2-year P/E range: 24.5x - 38.2x
-  - Current P/E: 32.1x (68th percentile)
-
-Running valuation models...
-  - WACC: 9.2%
-  - DCF (Perpetuity): $385 per share
-  - DCF (Exit Multiple): $392 per share
-  - Trading Comps: $365 per share
-  - Historical P/E (TTM): $355 - $410 per share
-  - Historical P/E (Forward): $375 - $435 per share
-
-Generating report...
-Report saved to: ./valuation_reports/MSFT_2026-01-20.md
-
-Valuation Summary:
-- Fair Value Range: $350 - $420 per share
-- Current Price: $378.50
-- Implied: -2% discount to midpoint
+```bash
+cd company-valuation/skills/run-valuation/scripts
+poetry run pytest -v
 ```
 
 ## Disclaimer

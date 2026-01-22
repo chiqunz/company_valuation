@@ -7,6 +7,12 @@ description: Use when identifying comparable companies and gathering their finan
 
 Identify and collect data for comparable companies to use in trading comps analysis.
 
+## Before You Start
+
+**Read the plugin README first** to understand the exact parameters needed:
+- See `README.md` section: **"Required Data Parameters > Peer Company Data (gather-peers)"**
+- This ensures you gather all required fields for each peer with correct types and units
+
 ## Peer Selection Criteria
 
 Select 4-6 peers based on:

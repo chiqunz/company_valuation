@@ -1,6 +1,7 @@
 ---
 name: value-company
 description: Run comprehensive company valuation analysis with DCF, Comps, LBO, and Historical P/E models
+disable-model-invocation: true
 ---
 
 # Company Valuation Command
@@ -10,7 +11,7 @@ Run a comprehensive institutional-grade valuation analysis for a publicly traded
 ## Usage
 
 ```
-/company-valuation:value-company <TICKER>
+/value-company <TICKER>
 ```
 
 ## Workflow

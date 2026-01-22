@@ -7,6 +7,44 @@ description: Use when executing DCF, Comps, LBO, and Historical P/E valuation mo
 
 Generate and execute Python code to run institutional valuation models.
 
+## Environment Setup
+
+**IMPORTANT**: Always use `poetry run` to execute Python code. Never use `pip install` or `python` directly.
+
+The valuation library is located in `scripts/` relative to this skill:
+```
+skills/run-valuation/
+├── SKILL.md
+└── scripts/
+    ├── pyproject.toml
+    ├── poetry.lock
+    ├── company_valuation/   # Python package
+    ├── tests/
+    └── examples/
+```
+
+### First-time Setup
+
+```bash
+# Navigate to scripts directory and install dependencies
+cd company-valuation/skills/run-valuation/scripts
+poetry install
+```
+
+### Running Python Code
+
+```bash
+# Run Python scripts
+cd company-valuation/skills/run-valuation/scripts
+poetry run python <script.py>
+
+# Run tests
+poetry run pytest -v
+
+# Run example
+poetry run python examples/example_valuation.py
+```
+
 ## Prerequisites
 
 Ensure the `company_valuation` library is available in the project:

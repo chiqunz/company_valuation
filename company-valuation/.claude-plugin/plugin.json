@@ -1,42 +1,5 @@
 {
   "name": "company-valuation",
   "version": "1.1.0",
-  "description": "Institutional-grade company valuation using DCF, Comps, LBO, and Historical P/E models",
-  "commands": [
-    {
-      "name": "value-company",
-      "description": "Run comprehensive company valuation analysis",
-      "file": "../commands/value-company.md"
-    }
-  ],
-  "skills": [
-    {
-      "name": "gather-market-data",
-      "file": "../skills/gather-market-data/SKILL.md"
-    },
-    {
-      "name": "gather-financials",
-      "file": "../skills/gather-financials/SKILL.md"
-    },
-    {
-      "name": "gather-peers",
-      "file": "../skills/gather-peers/SKILL.md"
-    },
-    {
-      "name": "gather-analyst-estimates",
-      "file": "../skills/gather-analyst-estimates/SKILL.md"
-    },
-    {
-      "name": "gather-historical-pe",
-      "file": "../skills/gather-historical-pe/SKILL.md"
-    },
-    {
-      "name": "run-valuation",
-      "file": "../skills/run-valuation/SKILL.md"
-    },
-    {
-      "name": "generate-report",
-      "file": "../skills/generate-report/SKILL.md"
-    }
-  ]
+  "description": "Institutional-grade company valuation using DCF, Comps, LBO, and Historical P/E models"
 }
