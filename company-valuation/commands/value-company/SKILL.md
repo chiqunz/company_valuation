@@ -54,7 +54,24 @@ Use the `gather-historical-pe` skill to search for:
 - Current P/E and percentile rank
 - TTM EPS and Forward EPS estimates
 
-### Step 6: Run Valuation Models
+### Step 6: Gather Risk & Potential Analysis
+Use the `gather-risk-potential-analysis` skill to research:
+
+**Stock-Specific Factors:**
+- Downside risks (financial, operational, competitive, regulatory, valuation)
+- Upside catalysts (growth, margin expansion, capital returns, undervaluation)
+
+**Industry-Level Factors:**
+- Industry headwinds and risks
+- Industry tailwinds and opportunities
+
+**Market-Level Factors:**
+- Macro risks (recession, inflation, rates, geopolitical)
+- Macro tailwinds (economic expansion, policy support)
+
+Perform a deep and thorough analysis covering all three levels to provide comprehensive context for the valuation.
+
+### Step 7: Run Valuation Models
 Use the `run-valuation` skill to execute Python code using the `company_valuation` library:
 - Calculate WACC using CAPM
 - Run DCF with perpetuity growth and exit multiple methods
@@ -63,7 +80,7 @@ Use the `run-valuation` skill to execute Python code using the `company_valuatio
 - Run Historical P/E valuation (using P/E percentiles × EPS)
 - Generate sensitivity tables
 
-### Step 7: Generate Report
+### Step 8: Generate Report
 Use the `generate-report` skill to create a comprehensive markdown report at:
 ```
 ./valuation_reports/{TICKER}_{DATE}.md

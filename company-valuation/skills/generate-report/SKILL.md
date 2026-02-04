@@ -218,19 +218,95 @@ At the current price of **${CURRENT_PRICE}**, the stock is trading at {PREMIUM_D
 
 ---
 
-## Key Assumptions & Risks
+## Key Assumptions
 
-### Assumptions
 - Revenue growth: {GROWTH_RATE}% annually
 - Terminal growth rate: {TERM_GROWTH}%
 - EBITDA margin: {EBITDA_MARGIN}%
 - Tax rate: {TAX_RATE}%
 
-### Key Risks
-- Market/macroeconomic conditions
-- Competitive dynamics
-- Execution risk on growth initiatives
-- Interest rate sensitivity
+---
+
+## Risk & Potential Analysis
+
+This section provides a comprehensive analysis of downside risks and upside catalysts at the stock, industry, and market levels.
+
+### Stock-Specific Risks
+
+| Category | Risk | Severity | Probability |
+|----------|------|----------|-------------|
+| {RISK1_CATEGORY} | {RISK1_DESC} | {RISK1_SEVERITY} | {RISK1_PROB} |
+| {RISK2_CATEGORY} | {RISK2_DESC} | {RISK2_SEVERITY} | {RISK2_PROB} |
+| {RISK3_CATEGORY} | {RISK3_DESC} | {RISK3_SEVERITY} | {RISK3_PROB} |
+| {RISK4_CATEGORY} | {RISK4_DESC} | {RISK4_SEVERITY} | {RISK4_PROB} |
+| {RISK5_CATEGORY} | {RISK5_DESC} | {RISK5_SEVERITY} | {RISK5_PROB} |
+
+**Key Risk Assessment:**
+{STOCK_RISK_NARRATIVE}
+
+### Stock-Specific Catalysts (Upside Potential)
+
+| Category | Catalyst | Impact | Timeline |
+|----------|----------|--------|----------|
+| {CAT1_CATEGORY} | {CAT1_DESC} | {CAT1_IMPACT} | {CAT1_TIMELINE} |
+| {CAT2_CATEGORY} | {CAT2_DESC} | {CAT2_IMPACT} | {CAT2_TIMELINE} |
+| {CAT3_CATEGORY} | {CAT3_DESC} | {CAT3_IMPACT} | {CAT3_TIMELINE} |
+| {CAT4_CATEGORY} | {CAT4_DESC} | {CAT4_IMPACT} | {CAT4_TIMELINE} |
+| {CAT5_CATEGORY} | {CAT5_DESC} | {CAT5_IMPACT} | {CAT5_TIMELINE} |
+
+**Key Catalyst Assessment:**
+{STOCK_CATALYST_NARRATIVE}
+
+### Industry Analysis
+
+#### Industry Headwinds (Risks)
+
+| Factor | Risk | Impact on Stock |
+|--------|------|-----------------|
+| {IND_RISK1_FACTOR} | {IND_RISK1_DESC} | {IND_RISK1_IMPACT} |
+| {IND_RISK2_FACTOR} | {IND_RISK2_DESC} | {IND_RISK2_IMPACT} |
+
+#### Industry Tailwinds (Opportunities)
+
+| Factor | Tailwind | Impact on Stock |
+|--------|----------|-----------------|
+| {IND_OPP1_FACTOR} | {IND_OPP1_DESC} | {IND_OPP1_IMPACT} |
+| {IND_OPP2_FACTOR} | {IND_OPP2_DESC} | {IND_OPP2_IMPACT} |
+
+**Industry Outlook:**
+{INDUSTRY_NARRATIVE}
+
+### Market Analysis
+
+#### Macro Headwinds (Risks)
+
+| Factor | Risk | Impact on Stock |
+|--------|------|-----------------|
+| {MKT_RISK1_FACTOR} | {MKT_RISK1_DESC} | {MKT_RISK1_IMPACT} |
+| {MKT_RISK2_FACTOR} | {MKT_RISK2_DESC} | {MKT_RISK2_IMPACT} |
+
+#### Macro Tailwinds (Opportunities)
+
+| Factor | Tailwind | Impact on Stock |
+|--------|----------|-----------------|
+| {MKT_OPP1_FACTOR} | {MKT_OPP1_DESC} | {MKT_OPP1_IMPACT} |
+| {MKT_OPP2_FACTOR} | {MKT_OPP2_DESC} | {MKT_OPP2_IMPACT} |
+
+**Market Environment Assessment:**
+{MARKET_NARRATIVE}
+
+### Risk-Reward Summary
+
+| Dimension | Assessment |
+|-----------|------------|
+| Overall Risk Level | {OVERALL_RISK_LEVEL} |
+| Overall Opportunity Level | {OVERALL_OPP_LEVEL} |
+| Primary Risk | {PRIMARY_RISK} |
+| Primary Catalyst | {PRIMARY_CATALYST} |
+| Net Risk-Reward | {NET_RISK_REWARD} |
+
+**Investment Thesis Implications:**
+{RISK_REWARD_THESIS}
 
 ---
 
